@@ -40,8 +40,9 @@ class WpHttpClient implements ClientInterface
         $wpResponse = wp_remote_request((string) $request->getUri(), $args);
 
         if (is_wp_error($wpResponse)) {
-            throw new \RuntimeException(
-                'HTTP request failed: ' . $wpResponse->get_error_message()
+            throw new NetworkException(
+                'HTTP request failed: ' . $wpResponse->get_error_message(),
+                $request
             );
         }
 
