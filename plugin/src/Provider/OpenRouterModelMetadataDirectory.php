@@ -94,7 +94,7 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
             return $cached;
         }
 
-        $response = wp_remote_get('https://openrouter.ai/api/v1/models', [
+        $response = wp_remote_get(OpenRouterProvider::apiBaseUrl() . '/models', [
             'timeout' => 15,
             'headers' => ['Accept' => 'application/json'],
         ]);

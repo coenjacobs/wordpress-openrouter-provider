@@ -22,6 +22,11 @@ class OpenRouterProvider extends AbstractApiProvider
         return 'https://openrouter.ai/api/v1';
     }
 
+    public static function apiBaseUrl(): string
+    {
+        return static::baseUrl();
+    }
+
     protected static function createProviderMetadata(): ProviderMetadata
     {
         return new ProviderMetadata(
