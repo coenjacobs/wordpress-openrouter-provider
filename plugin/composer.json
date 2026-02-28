@@ -6,7 +6,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+        "coenjacobs/wordpress-ai-provider": "@dev"
     },
     "autoload": {
         "psr-4": {
@@ -27,6 +28,16 @@
         "phpmd/phpmd": "^2.15",
         "niels-de-blaauw/php-doc-check": "^0.4.0"
     },
+    "extra": {
+        "mozart": {
+            "dep_namespace": "CoenJacobs\\OpenRouterProvider\\Dependencies\\",
+            "dep_directory": "/src/Dependencies/",
+            "classmap_directory": "/src/Dependencies/classes/",
+            "classmap_prefix": "OPENROUTER_DEP_",
+            "packages": ["coenjacobs/wordpress-ai-provider"],
+            "delete_vendor_directories": true
+        }
+    },
     "scripts": {
         "test": [
             "@test:lint",
@@ -42,10 +53,10 @@
             "./vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=2G"
         ],
         "test:phpmd": [
-            "./vendor/bin/phpmd src ansi phpmd.xml.dist"
+            "./vendor/bin/phpmd src ansi phpmd.xml.dist --exclude src/Dependencies"
         ],
         "test:docs": [
-            "./vendor/bin/php-doc-check src"
+            "./vendor/bin/php-doc-check src --exclude src/Dependencies"
         ]
     }
 }

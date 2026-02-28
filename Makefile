@@ -1,4 +1,4 @@
-.PHONY: up down build setup clean-wp download-wp configure-wp install-wp install-ai-plugin composer activate test test-lint test-phpstan test-phpmd test-docs
+.PHONY: up down build setup clean-wp download-wp configure-wp install-wp install-ai-plugin composer mozart activate test test-lint test-phpstan test-phpmd test-docs
 
 DOCKER_EXEC = docker compose exec -T wordpress
 WP = $(DOCKER_EXEC) wp --allow-root
@@ -13,7 +13,7 @@ down:
 build:
 	docker compose build
 
-setup: clean-wp download-wp configure-wp install-wp install-ai-plugin composer activate
+setup: clean-wp download-wp configure-wp install-wp install-ai-plugin composer mozart activate
 
 clean-wp:
 	docker compose down
@@ -52,6 +52,10 @@ install-ai-plugin:
 
 composer:
 	$(DOCKER_EXEC) sh -c "cd /var/www/html/wp-content/plugins/openrouter-provider && composer install --no-interaction"
+
+mozart:
+	docker run --rm -v "$(CURDIR)/plugin:/project" coenjacobs/mozart /mozart/bin/mozart compose
+	$(DOCKER_EXEC) sh -c "cd /var/www/html/wp-content/plugins/openrouter-provider && composer dump-autoload"
 
 activate:
 	$(WP) plugin activate openrouter-provider

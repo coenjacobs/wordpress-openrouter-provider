@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace CoenJacobs\OpenRouterProvider\Provider;
 
+use CoenJacobs\OpenRouterProvider\Plugin;
 use CoenJacobs\OpenRouterProvider\Provider\Models\TextGenerationModel;
+use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\Provider\ApiKeyProviderAvailability;
 use RuntimeException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
 use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
@@ -40,17 +42,14 @@ class OpenRouterProvider extends AbstractApiProvider
 
     protected static function createProviderAvailability(): ProviderAvailabilityInterface
     {
-        return new OpenRouterProviderAvailability();
+        return new ApiKeyProviderAvailability(Plugin::providerConfig());
     }
 
     protected static function createModelMetadataDirectory(): ModelMetadataDirectoryInterface
     {
-        return new OpenRouterModelMetadataDirectory();
+        return new OpenRouterModelMetadataDirectory(Plugin::providerConfig());
     }
 
-    /**
-     * Create a text generation model for the given metadata.
-     */
     protected static function createModel(
         ModelMetadata $modelMetadata,
         ProviderMetadata $providerMetadata

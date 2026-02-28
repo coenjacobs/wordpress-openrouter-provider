@@ -3,6 +3,9 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     paths:
       - ./src
+    excludePaths:
+      analyse:
+        - ./src/Dependencies
     scanFiles:
       - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     scanDirectories:
