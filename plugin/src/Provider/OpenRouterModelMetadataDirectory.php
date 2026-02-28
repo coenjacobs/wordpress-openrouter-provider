@@ -70,7 +70,7 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
 
             $this->modelMetadataMap[$modelId] = new ModelMetadata(
                 $modelId,
-                $model['name'] ?? $modelId,
+                $model['name'],
                 [
                     CapabilityEnum::textGeneration(),
                     CapabilityEnum::chatHistory(),
@@ -85,9 +85,9 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
     /**
      * Fetch all models from the API (with transient cache).
      *
-     * @return list<array{id: string, name?: string}>
+     * @return list<array{id: string, name: string, provider: string, free: bool}>
      */
-    private function fetchAllModels(): array
+    public function fetchAllModels(): array
     {
         $cached = get_transient('openrouter_models_raw');
         if ($cached !== false && is_array($cached)) {
@@ -125,15 +125,35 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
                 continue;
             }
 
+            $pricing = $model['pricing'] ?? [];
+            $isFree = (($pricing['prompt'] ?? null) === '0' && ($pricing['completion'] ?? null) === '0');
+
             $models[] = [
                 'id' => $model['id'],
                 'name' => $model['name'] ?? $model['id'],
+                'provider' => self::extractProviderFromId($model['id']),
+                'free' => $isFree,
             ];
         }
 
         set_transient('openrouter_models_raw', $models, 10 * MINUTE_IN_SECONDS);
 
         return $models;
+    }
+
+    /**
+     * Extract the provider prefix from an OpenRouter model ID.
+     *
+     * OpenRouter model IDs follow the format "provider/model-name".
+     */
+    public static function extractProviderFromId(string $modelId): string
+    {
+        $slashPos = strpos($modelId, '/');
+        if ($slashPos === false) {
+            return 'Other';
+        }
+
+        return substr($modelId, 0, $slashPos);
     }
 
     /**

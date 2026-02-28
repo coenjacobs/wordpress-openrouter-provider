@@ -218,82 +218,14 @@ class OpenRouterSettings
     }
 
     /**
-     * Fetch available models from the API, with transient caching.
+     * Fetch available models from the API via the model metadata directory.
      *
      * @return list<array{id: string, name: string, provider: string, free: bool}>
      */
-    public function fetchModels(): array
+    private function fetchModels(): array
     {
-        $cached = get_transient('openrouter_models');
-        if ($cached !== false) {
-            return $cached;
-        }
-
-        $response = wp_remote_get('https://openrouter.ai/api/v1/models', [
-            'timeout' => 15,
-            'headers' => ['Content-Type' => 'application/json'],
-        ]);
-
-        if (is_wp_error($response)) {
-            return [];
-        }
-
-        $status = wp_remote_retrieve_response_code($response);
-        if ($status !== 200) {
-            return [];
-        }
-
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
-        if (!is_array($data)) {
-            return [];
-        }
-
-        $modelList = $data['data'] ?? $data;
-        if (!is_array($modelList)) {
-            return [];
-        }
-
-        $models = [];
-        foreach ($modelList as $model) {
-            if (!isset($model['id'])) {
-                continue;
-            }
-
-            $provider = $this->extractProviderFromId($model['id']);
-            $pricing = $model['pricing'] ?? [];
-            $isFree = (($pricing['prompt'] ?? null) === '0' && ($pricing['completion'] ?? null) === '0');
-
-            $models[] = [
-                'id' => $model['id'],
-                'name' => $model['name'] ?? $model['id'],
-                'provider' => $provider,
-                'free' => $isFree,
-            ];
-        }
-
-        usort($models, function ($a, $b) {
-            return strcmp($a['id'], $b['id']);
-        });
-
-        set_transient('openrouter_models', $models, 10 * MINUTE_IN_SECONDS);
-
-        return $models;
-    }
-
-    /**
-     * Extract the provider prefix from an OpenRouter model ID.
-     *
-     * OpenRouter model IDs follow the format "provider/model-name".
-     */
-    private function extractProviderFromId(string $modelId): string
-    {
-        $slashPos = strpos($modelId, '/');
-        if ($slashPos === false) {
-            return 'Other';
-        }
-
-        return substr($modelId, 0, $slashPos);
+        $directory = new OpenRouterModelMetadataDirectory();
+        return $directory->fetchAllModels();
     }
 
     /**
@@ -332,7 +264,6 @@ class OpenRouterSettings
 
         $old_key = $existing[self::PROVIDER_ID] ?? '';
         if ($new_key !== $old_key) {
-            delete_transient('openrouter_models');
             delete_transient('openrouter_models_raw');
         }
 
@@ -355,7 +286,6 @@ class OpenRouterSettings
             return;
         }
 
-        delete_transient('openrouter_models');
         delete_transient('openrouter_models_raw');
 
         wp_safe_redirect(admin_url('options-general.php?page=' . SettingsPage::PAGE_SLUG));
