@@ -327,7 +327,7 @@ class OpenRouterSettings
         }
 
         $new_key = isset($input[self::PROVIDER_ID])
-            ? sanitize_text_field($input[self::PROVIDER_ID])
+            ? trim($input[self::PROVIDER_ID])
             : ($existing[self::PROVIDER_ID] ?? '');
 
         $old_key = $existing[self::PROVIDER_ID] ?? '';
