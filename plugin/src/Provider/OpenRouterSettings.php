@@ -347,6 +347,10 @@ class OpenRouterSettings
             return;
         }
 
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
         if (!check_admin_referer('openrouter_refresh_models')) {
             return;
         }
