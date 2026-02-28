@@ -177,7 +177,7 @@ class OpenRouterSettings
         );
 
         echo '<div class="model-selector" data-default-collapsed="true" data-grouped="true"'
-            . ' data-stale-models="' . esc_attr(wp_json_encode($staleModels)) . '">';
+            . ' data-stale-models="' . esc_attr((string) wp_json_encode($staleModels)) . '">';
         echo '<select class="model-selector__filter">';
         echo '<option value="all">All models</option>';
         echo '<option value="free">Free only</option>';
