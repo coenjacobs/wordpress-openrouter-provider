@@ -167,12 +167,14 @@ class OpenRouterSettings
         ksort($grouped);
 
         $pluginFile = dirname(__DIR__, 2) . '/openrouter-provider.php';
+        $pluginData = get_file_data($pluginFile, ['Version' => 'Version']);
+        $version = $pluginData['Version'] ?: '0.1.0';
 
         wp_enqueue_script(
             'openrouter-model-selector',
             plugins_url('assets/model-selector.js', $pluginFile),
             [],
-            '0.1.0',
+            $version,
             true
         );
 
@@ -180,7 +182,7 @@ class OpenRouterSettings
             'openrouter-model-selector',
             plugins_url('assets/model-selector.css', $pluginFile),
             [],
-            '0.1.0'
+            $version
         );
 
         echo '<div class="model-selector" data-default-collapsed="true" data-grouped="true"'
