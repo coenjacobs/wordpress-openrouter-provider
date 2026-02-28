@@ -1,0 +1,6 @@
+/.claude/
+/wordpress/
+/docker/mariadb/data/
+.DS_Store
+
+CLAUDE.md

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--suppress XmlUnboundNsPrefix -->
+<ruleset name="openrouter-provider">
+    <description>Coding standard ruleset based on the PSR-12 coding standard.</description>
+    <rule ref="PSR12"/>
+
+    <rule ref="PHPCompatibility"/>
+    <config name="testVersion" value="7.4-8.5"/>
+
+    <file>./src</file>
+</ruleset>

@@ -1,0 +1,60 @@
+name: Lint, test and analyse
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    name: Linting
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: make build
+      - name: Setup WordPress
+        run: make setup
+      - name: Run linting
+        run: make test-lint
+
+  analysis:
+    runs-on: ubuntu-latest
+    name: Static Analysis
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: make build
+      - name: Setup WordPress
+        run: make setup
+      - name: Run PHPStan
+        run: make test-phpstan
+
+  mess-detect:
+    runs-on: ubuntu-latest
+    name: Mess Detector
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: make build
+      - name: Setup WordPress
+        run: make setup
+      - name: Run PHPMD
+        run: make test-phpmd
+
+  doc-check:
+    runs-on: ubuntu-latest
+    name: Documentation Check
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: make build
+      - name: Setup WordPress
+        run: make setup
+      - name: Run doc check
+        run: make test-docs

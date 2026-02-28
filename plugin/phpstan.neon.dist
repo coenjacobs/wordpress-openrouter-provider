@@ -1,0 +1,25 @@
+parameters:
+    level: 8
+    reportUnmatchedIgnoredErrors: false
+    paths:
+      - ./src
+    scanFiles:
+      - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    scanDirectories:
+      # WordPress AI Client SDK (core version, has RequestAuthenticationMethod and 5-param ProviderMetadata)
+      - ../../../wp-includes/php-ai-client/src
+      # PSR interfaces (from AI Experiments plugin, unscoped)
+      - ../../../wp-content/plugins/ai/vendor/psr
+      # Nyholm PSR-7 (from AI Experiments plugin, unscoped)
+      - ../../../wp-content/plugins/ai/vendor/nyholm
+      # WpOrg Requests library
+      - ../../../wp-includes/Requests/src
+    ignoreErrors:
+      # Iterable value type hints (level 8 strictness, not actionable without full SDK type info)
+      - '#no value type specified in iterable type array#'
+      # WordPress time constants defined at runtime in default-constants.php
+      - '#Constant MINUTE_IN_SECONDS not found#'
+      # Scoped vs unscoped PSR namespace mismatch (see WPAI-TRANSPORT-BUG.md)
+      # Core SDK expects WordPress\AiClientDependencies\Psr\*, but at runtime AI Experiments
+      # loads unscoped Psr\* which works due to autoloader precedence.
+      - '#expects WordPress\\AiClientDependencies\\#'

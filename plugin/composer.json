@@ -1,0 +1,51 @@
+{
+    "name": "coenjacobs/openrouter-provider",
+    "description": "OpenRouter AI provider for WordPress AI Client",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "CoenJacobs\\OpenRouterProvider\\": "src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpcompatibility/php-compatibility": "^10.1",
+        "php-stubs/wordpress-stubs": "^6.9",
+        "phpstan/phpstan": "^1.12",
+        "phpmd/phpmd": "^2.15",
+        "niels-de-blaauw/php-doc-check": "^0.4.0"
+    },
+    "scripts": {
+        "test": [
+            "@test:lint",
+            "@test:phpstan",
+            "@test:phpmd",
+            "@test:docs"
+        ],
+        "test:lint": [
+            "composer validate",
+            "./vendor/bin/phpcs --standard=phpcs.xml.dist"
+        ],
+        "test:phpstan": [
+            "./vendor/bin/phpstan analyse -c phpstan.neon.dist --memory-limit=2G"
+        ],
+        "test:phpmd": [
+            "./vendor/bin/phpmd src ansi phpmd.xml.dist"
+        ],
+        "test:docs": [
+            "./vendor/bin/php-doc-check src"
+        ]
+    }
+}
