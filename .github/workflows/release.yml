@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+env:
+  PLUGIN_SLUG: openrouter-provider
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build and attach release zip
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: composer:v2
+
+      - name: Install Composer dependencies (no dev)
+        working-directory: plugin
+        run: composer install --no-interaction --no-dev --prefer-dist
+
+      - name: Copy assets from shared package
+        run: cp -r plugin/vendor/coenjacobs/wordpress-ai-provider/assets plugin/assets
+
+      - name: Run Mozart to scope dependencies
+        run: docker run --rm -v "${{ github.workspace }}/plugin:/project" coenjacobs/mozart /mozart/bin/mozart compose
+
+      - name: Dump Composer autoload
+        working-directory: plugin
+        run: composer dump-autoload --no-interaction
+
+      - name: Assemble distribution
+        run: |
+          mkdir -p "dist/${PLUGIN_SLUG}"
+          cp -r plugin/ "dist/${PLUGIN_SLUG}/"
+          cd "dist/${PLUGIN_SLUG}"
+          rm -f .gitignore composer.json composer.lock phpcs.xml.dist phpstan.neon.dist phpmd.xml.dist
+
+      - name: Create zip archive
+        working-directory: dist
+        run: zip -r "../${PLUGIN_SLUG}-${{ steps.version.outputs.version }}.zip" "${PLUGIN_SLUG}/"
+
+      - name: Upload zip to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "${PLUGIN_SLUG}-${{ steps.version.outputs.version }}.zip"
