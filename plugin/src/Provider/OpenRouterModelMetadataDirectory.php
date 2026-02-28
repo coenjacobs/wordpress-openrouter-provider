@@ -127,17 +127,18 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
 
         $models = [];
         foreach ($modelList as $model) {
-            if (!isset($model['id'])) {
+            if (!isset($model['id']) || !is_string($model['id'])) {
                 continue;
             }
 
+            $modelId = substr($model['id'], 0, 200);
             $pricing = $model['pricing'] ?? [];
             $isFree = (($pricing['prompt'] ?? null) === '0' && ($pricing['completion'] ?? null) === '0');
 
             $models[] = [
-                'id' => $model['id'],
-                'name' => $model['name'] ?? $model['id'],
-                'provider' => self::extractProviderFromId($model['id']),
+                'id' => $modelId,
+                'name' => $model['name'] ?? $modelId,
+                'provider' => self::extractProviderFromId($modelId),
                 'free' => $isFree,
             ];
         }
