@@ -100,11 +100,17 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
         ]);
 
         if (is_wp_error($response)) {
+            set_transient('openrouter_models_fetch_error', $response->get_error_message(), HOUR_IN_SECONDS);
             return [];
         }
 
         $status = wp_remote_retrieve_response_code($response);
         if ($status !== 200) {
+            set_transient(
+                'openrouter_models_fetch_error',
+                sprintf('API returned HTTP %d', $status),
+                HOUR_IN_SECONDS
+            );
             return [];
         }
 
@@ -136,6 +142,7 @@ class OpenRouterModelMetadataDirectory implements ModelMetadataDirectoryInterfac
             ];
         }
 
+        delete_transient('openrouter_models_fetch_error');
         set_transient('openrouter_models_raw', $models, 10 * MINUTE_IN_SECONDS);
 
         return $models;

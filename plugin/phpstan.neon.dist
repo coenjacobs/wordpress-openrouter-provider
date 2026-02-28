@@ -19,6 +19,7 @@ parameters:
       - '#no value type specified in iterable type array#'
       # WordPress time constants defined at runtime in default-constants.php
       - '#Constant MINUTE_IN_SECONDS not found#'
+      - '#Constant HOUR_IN_SECONDS not found#'
       # Scoped vs unscoped PSR namespace mismatch (see WPAI-TRANSPORT-BUG.md)
       # Core SDK expects WordPress\AiClientDependencies\Psr\*, but at runtime AI Experiments
       # loads unscoped Psr\* which works due to autoloader precedence.

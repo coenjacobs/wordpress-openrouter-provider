@@ -145,6 +145,13 @@ class OpenRouterSettings
             $enabled = [];
         }
 
+        $fetchError = get_transient('openrouter_models_fetch_error');
+        if (is_string($fetchError) && $fetchError !== '') {
+            echo '<div class="notice notice-error inline"><p>'
+                . 'Failed to fetch models: ' . esc_html($fetchError)
+                . '</p></div>';
+        }
+
         if (empty($models)) {
             echo '<p class="description">No models found. Try <strong>Refresh Model List</strong> below.</p>';
             return;
