@@ -49,7 +49,7 @@ jobs:
       - name: Assemble distribution
         run: |
           mkdir -p "dist/${PLUGIN_SLUG}"
-          cp -r plugin/ "dist/${PLUGIN_SLUG}/"
+          cp -r plugin/. "dist/${PLUGIN_SLUG}/"
           cd "dist/${PLUGIN_SLUG}"
           rm -f .gitignore composer.json composer.lock phpcs.xml.dist phpstan.neon.dist phpmd.xml.dist
 
