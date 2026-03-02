@@ -54,8 +54,8 @@ composer:
 	$(DOCKER_EXEC) sh -c "cd /var/www/html/wp-content/plugins/openrouter-provider && composer install --no-interaction"
 
 mozart:
-	cp -r plugin/vendor/coenjacobs/wordpress-ai-provider/assets plugin/assets
-	docker run --rm -v "$(CURDIR)/plugin:/project" coenjacobs/mozart /mozart/bin/mozart compose
+	cp -r vendor/coenjacobs/wordpress-ai-provider/assets assets
+	docker run --rm -v "$(CURDIR):/project" coenjacobs/mozart /mozart/bin/mozart compose
 	$(DOCKER_EXEC) sh -c "cd /var/www/html/wp-content/plugins/openrouter-provider && composer dump-autoload"
 
 activate:

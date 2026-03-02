@@ -14,7 +14,7 @@ Clone this repository into your `wp-content/plugins/` directory:
 
 ```bash
 git clone https://github.com/coenjacobs/wordpress-openrouter-provider.git wp-content/plugins/openrouter-provider
-cd wp-content/plugins/openrouter-provider/plugin
+cd wp-content/plugins/openrouter-provider
 composer install
 ```
 
@@ -79,5 +79,5 @@ This gives you a working WordPress 7.0-beta2 installation at **http://localhost:
 ### Volume Mounts
 
 - `./wordpress/` → `/var/www/html` — WordPress root (gitignored)
-- `./plugin/` → `/var/www/html/wp-content/plugins/openrouter-provider` — plugin source
+- `./` → `/var/www/html/wp-content/plugins/openrouter-provider` — plugin source
 - `./docker/mariadb/data/` → `/var/lib/mysql` — database storage (gitignored)

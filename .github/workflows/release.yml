@@ -33,25 +33,24 @@ jobs:
           tools: composer:v2
 
       - name: Install Composer dependencies (no dev)
-        working-directory: plugin
         run: composer install --no-interaction --no-dev --prefer-dist
 
       - name: Copy assets from shared package
-        run: cp -r plugin/vendor/coenjacobs/wordpress-ai-provider/assets plugin/assets
+        run: cp -r vendor/coenjacobs/wordpress-ai-provider/assets assets
 
       - name: Run Mozart to scope dependencies
-        run: docker run --rm -v "${{ github.workspace }}/plugin:/project" coenjacobs/mozart /mozart/bin/mozart compose
+        run: docker run --rm -v "${{ github.workspace }}:/project" coenjacobs/mozart /mozart/bin/mozart compose
 
       - name: Dump Composer autoload
-        working-directory: plugin
         run: composer dump-autoload --no-interaction
 
       - name: Assemble distribution
         run: |
           mkdir -p "dist/${PLUGIN_SLUG}"
-          cp -r plugin/. "dist/${PLUGIN_SLUG}/"
-          cd "dist/${PLUGIN_SLUG}"
-          rm -f .gitignore composer.json composer.lock phpcs.xml.dist phpstan.neon.dist phpmd.xml.dist
+          while IFS= read -r entry || [ -n "$entry" ]; do
+            [ -z "$entry" ] || [ "${entry:0:1}" = "#" ] && continue
+            cp -r "$entry" "dist/${PLUGIN_SLUG}/"
+          done < .distinclude
 
       - name: Create zip archive
         working-directory: dist
