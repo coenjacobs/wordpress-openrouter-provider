@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CoenJacobs\OpenRouterProvider\Provider;
 
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\AbstractModelMetadataDirectory;
+use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\ModalityDetector;
 
 class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
 {
@@ -23,12 +24,26 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
         $pricing = $rawModel['pricing'] ?? [];
         $isFree = (($pricing['prompt'] ?? null) === '0' && ($pricing['completion'] ?? null) === '0');
 
+        $architecture = $rawModel['architecture'] ?? [];
+
         return [
             'id' => $modelId,
             'name' => $rawModel['name'] ?? $modelId,
             'provider' => self::extractProviderFromId($modelId),
             'free' => $isFree,
+            'input_modalities' => $architecture['input_modalities'] ?? ['text'],
+            'output_modalities' => $architecture['output_modalities'] ?? ['text'],
         ];
+    }
+
+    protected function detectInputModalities(array $modelData): array
+    {
+        return ModalityDetector::toModalityEnums($modelData['input_modalities'] ?? ['text']);
+    }
+
+    protected function detectOutputModalities(array $modelData): array
+    {
+        return ModalityDetector::toModalityEnums($modelData['output_modalities'] ?? ['text']);
     }
 
     /**
