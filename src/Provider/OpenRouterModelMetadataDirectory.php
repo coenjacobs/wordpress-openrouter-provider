@@ -6,6 +6,10 @@ namespace CoenJacobs\OpenRouterProvider\Provider;
 
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\AbstractModelMetadataDirectory;
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\ModalityDetector;
+use WordPress\AiClient\Messages\Enums\ModalityEnum;
+use WordPress\AiClient\Providers\Models\DTO\SupportedOption;
+use WordPress\AiClient\Providers\Models\Enums\CapabilityEnum;
+use WordPress\AiClient\Providers\Models\Enums\OptionEnum;
 
 class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
 {
@@ -44,6 +48,105 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
     protected function detectOutputModalities(array $modelData): array
     {
         return ModalityDetector::toModalityEnums($modelData['output_modalities'] ?? ['text']);
+    }
+
+    /**
+     * Detect capabilities based on output modalities.
+     *
+     * - Output includes only 'image' → [imageGeneration]
+     * - Output includes both 'text' and 'image' → [textGeneration, chatHistory, imageGeneration]
+     * - Output is text only → [textGeneration, chatHistory]
+     *
+     * @param array<string, mixed> $modelData
+     * @return list<CapabilityEnum>
+     */
+    protected function detectCapabilities(array $modelData): array
+    {
+        $outputModalities = $modelData['output_modalities'] ?? ['text'];
+        $hasText = in_array('text', $outputModalities, true);
+        $hasImage = in_array('image', $outputModalities, true);
+
+        if ($hasText && $hasImage) {
+            return [
+                CapabilityEnum::textGeneration(),
+                CapabilityEnum::chatHistory(),
+                CapabilityEnum::imageGeneration(),
+            ];
+        }
+
+        if ($hasImage) {
+            return [
+                CapabilityEnum::imageGeneration(),
+            ];
+        }
+
+        return [
+            CapabilityEnum::textGeneration(),
+            CapabilityEnum::chatHistory(),
+        ];
+    }
+
+    /**
+     * Build supported options based on model capabilities.
+     *
+     * @param array<string, mixed> $modelData
+     * @return list<SupportedOption>
+     */
+    protected function buildSupportedOptions(array $modelData): array
+    {
+        $outputModalities = $modelData['output_modalities'] ?? ['text'];
+        $hasText = in_array('text', $outputModalities, true);
+        $hasImage = in_array('image', $outputModalities, true);
+
+        if ($hasImage && !$hasText) {
+            return $this->buildImageOnlyOptions($modelData);
+        }
+
+        if ($hasImage) {
+            return $this->buildMixedModalityOptions($modelData);
+        }
+
+        return parent::buildSupportedOptions($modelData);
+    }
+
+    /**
+     * Build options for pure image generation models.
+     *
+     * @param array<string, mixed> $modelData
+     * @return list<SupportedOption>
+     */
+    private function buildImageOnlyOptions(array $modelData): array
+    {
+        return [
+            new SupportedOption(
+                OptionEnum::inputModalities(),
+                [$this->detectInputModalities($modelData)]
+            ),
+            new SupportedOption(
+                OptionEnum::outputModalities(),
+                [[ModalityEnum::image()]]
+            ),
+            new SupportedOption(OptionEnum::candidateCount()),
+            new SupportedOption(OptionEnum::outputMediaAspectRatio()),
+            new SupportedOption(OptionEnum::customOptions()),
+        ];
+    }
+
+    /**
+     * Build options for mixed text+image models.
+     *
+     * @param array<string, mixed> $modelData
+     * @return list<SupportedOption>
+     */
+    private function buildMixedModalityOptions(array $modelData): array
+    {
+        $options = parent::buildSupportedOptions($modelData);
+
+        $options[] = new SupportedOption(OptionEnum::candidateCount());
+        $options[] = new SupportedOption(OptionEnum::outputMediaAspectRatio());
+        $options[] = new SupportedOption(OptionEnum::customOptions());
+
+        return $options;
     }
 
     /**

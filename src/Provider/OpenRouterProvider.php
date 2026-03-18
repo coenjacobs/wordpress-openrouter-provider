@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace CoenJacobs\OpenRouterProvider\Provider;
 
 use CoenJacobs\OpenRouterProvider\Plugin;
+use CoenJacobs\OpenRouterProvider\Provider\Models\ImageGenerationModel;
+use CoenJacobs\OpenRouterProvider\Provider\Models\MultiModalTextGenerationModel;
 use CoenJacobs\OpenRouterProvider\Provider\Models\TextGenerationModel;
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\Provider\ApiKeyProviderAvailability;
 use RuntimeException;
@@ -50,14 +52,42 @@ class OpenRouterProvider extends AbstractApiProvider
         return new OpenRouterModelMetadataDirectory(Plugin::providerConfig());
     }
 
+    /**
+     * Creates the appropriate model instance based on supported capabilities.
+     *
+     * Routes to MultiModalTextGenerationModel for mixed text+image,
+     * ImageGenerationModel for pure image, or TextGenerationModel for text-only.
+     *
+     * @param ModelMetadata $modelMetadata The model metadata.
+     * @param ProviderMetadata $providerMetadata The provider metadata.
+     * @return ModelInterface The created model instance.
+     */
     protected static function createModel(
         ModelMetadata $modelMetadata,
         ProviderMetadata $providerMetadata
     ): ModelInterface {
+        $hasTextGeneration = false;
+        $hasImageGeneration = false;
+
         foreach ($modelMetadata->getSupportedCapabilities() as $capability) {
             if ($capability->isTextGeneration()) {
-                return new TextGenerationModel($modelMetadata, $providerMetadata);
+                $hasTextGeneration = true;
             }
+            if ($capability->isImageGeneration()) {
+                $hasImageGeneration = true;
+            }
+        }
+
+        if ($hasTextGeneration && $hasImageGeneration) {
+            return new MultiModalTextGenerationModel($modelMetadata, $providerMetadata);
+        }
+
+        if ($hasImageGeneration) {
+            return new ImageGenerationModel($modelMetadata, $providerMetadata);
+        }
+
+        if ($hasTextGeneration) {
+            return new TextGenerationModel($modelMetadata, $providerMetadata);
         }
 
         throw new RuntimeException(
