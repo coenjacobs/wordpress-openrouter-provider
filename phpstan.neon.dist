@@ -9,12 +9,10 @@ parameters:
     scanFiles:
       - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     scanDirectories:
-      # WordPress AI Client SDK (core version, has RequestAuthenticationMethod and 5-param ProviderMetadata)
+      # WordPress AI Client SDK (core)
       - ../../../wp-includes/php-ai-client/src
-      # PSR interfaces (from AI Experiments plugin, unscoped)
-      - ../../../wp-content/plugins/ai/vendor/psr
-      # Nyholm PSR-7 (from AI Experiments plugin, unscoped)
-      - ../../../wp-content/plugins/ai/vendor/nyholm
+      # Scoped third-party dependencies bundled with core SDK
+      - ../../../wp-includes/php-ai-client/third-party
       # WpOrg Requests library
       - ../../../wp-includes/Requests/src
     ignoreErrors:
@@ -23,7 +21,3 @@ parameters:
       # WordPress time constants defined at runtime in default-constants.php
       - '#Constant MINUTE_IN_SECONDS not found#'
       - '#Constant HOUR_IN_SECONDS not found#'
-      # Scoped vs unscoped PSR namespace mismatch (see WPAI-TRANSPORT-BUG.md)
-      # Core SDK expects WordPress\AiClientDependencies\Psr\*, but at runtime AI Experiments
-      # loads unscoped Psr\* which works due to autoloader precedence.
-      - '#expects WordPress\\AiClientDependencies\\#'
