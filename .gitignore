@@ -7,4 +7,5 @@ CLAUDE.md
 
 /vendor/
 /assets/
+!/assets/logo.svg
 /src/Dependencies/

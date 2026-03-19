@@ -40,6 +40,7 @@ class OpenRouterProvider extends AbstractApiProvider
             'https://openrouter.ai/settings/keys',
             RequestAuthenticationMethod::apiKey(),
             'Unified API gateway with hundreds of AI models across multiple providers.',
+            dirname(__DIR__, 2) . '/assets/logo.svg',
         );
     }
 
