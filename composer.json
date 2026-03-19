@@ -7,7 +7,8 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.4",
-        "coenjacobs/wordpress-ai-provider": "^0.1.0"
+        "coenjacobs/wordpress-ai-provider": "^0.1.0",
+        "lapisense/wordpress-client": "^0.2.0"
     },
     "autoload": {
         "psr-4": {
@@ -34,7 +35,10 @@
             "dep_directory": "/src/Dependencies/",
             "classmap_directory": "/src/Dependencies/classes/",
             "classmap_prefix": "OPENROUTER_DEP_",
-            "packages": ["coenjacobs/wordpress-ai-provider"],
+            "packages": [
+                "coenjacobs/wordpress-ai-provider",
+                "lapisense/wordpress-client"
+            ],
             "delete_vendor_directories": true
         }
     },
