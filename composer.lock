@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab8a33fe575b1bd6ee90d82fb43ae61a",
+    "content-hash": "3ce86b0e1b4b2782a50aa6e7c9d5ad5e",
     "packages": [
         {
             "name": "coenjacobs/wordpress-ai-provider",
-            "version": "0.2.0",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/coenjacobs/wordpress-ai-provider.git",
-                "reference": "5134abb1909d9ff621bd1deca47150cabf9ea9cc"
+                "reference": "333792fdf61228587da325f58ee6eb44906bb2f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/coenjacobs/wordpress-ai-provider/zipball/5134abb1909d9ff621bd1deca47150cabf9ea9cc",
-                "reference": "5134abb1909d9ff621bd1deca47150cabf9ea9cc",
+                "url": "https://api.github.com/repos/coenjacobs/wordpress-ai-provider/zipball/333792fdf61228587da325f58ee6eb44906bb2f5",
+                "reference": "333792fdf61228587da325f58ee6eb44906bb2f5",
                 "shasum": ""
             },
             "require": {
@@ -36,9 +36,9 @@
             "description": "Shared base package for WordPress AI provider plugins",
             "support": {
                 "issues": "https://github.com/coenjacobs/wordpress-ai-provider/issues",
-                "source": "https://github.com/coenjacobs/wordpress-ai-provider/tree/0.2.0"
+                "source": "https://github.com/coenjacobs/wordpress-ai-provider/tree/0.4.0"
             },
-            "time": "2026-03-19T15:20:55+00:00"
+            "time": "2026-03-19T15:46:16+00:00"
         },
         {
             "name": "lapisense/php-client",
