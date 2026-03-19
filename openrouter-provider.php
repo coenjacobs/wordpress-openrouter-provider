@@ -14,12 +14,20 @@ declare(strict_types=1);
  */
 
 use CoenJacobs\OpenRouterProvider\Plugin;
+use CoenJacobs\OpenRouterProvider\Dependencies\Lapisense\WordPressClient\Client;
 
 if ( ! defined( 'ABSPATH' ) ) {
     return;
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
+
+Client::init( [
+    'store_url'    => 'https://lapisense.coenjacobs.com',
+    'product_uuid' => '98a75e22-10f1-4270-bb01-6deac6ec4dc7',
+    'product_type' => 'plugin',
+    'file'         => __FILE__,
+] );
 
 add_action( 'plugins_loaded', function () {
     Plugin::instance()->setup();
