@@ -7,7 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.4",
-        "coenjacobs/wordpress-ai-provider": "^0.1.0",
+        "coenjacobs/wordpress-ai-provider": "^0.2.0",
         "lapisense/wordpress-client": "^0.2.0"
     },
     "autoload": {
