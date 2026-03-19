@@ -23,8 +23,6 @@ class Plugin extends AbstractProviderPlugin
             self::$providerConfig = new ProviderConfig([
                 'providerId' => 'openrouter',
                 'providerName' => 'OpenRouter',
-                'envVarName' => 'OPENROUTER_API_KEY',
-                'constantName' => 'OPENROUTER_API_KEY',
                 'enabledModelsOption' => 'openrouter_enabled_models',
                 'modelsTransientKey' => 'openrouter_models_raw',
                 'errorTransientKey' => 'openrouter_models_fetch_error',
@@ -34,9 +32,9 @@ class Plugin extends AbstractProviderPlugin
                 'optionGroup' => 'openrouter-provider',
                 'sectionId' => 'openrouter',
                 'sectionTitle' => 'OpenRouter',
-                'sectionDescriptionHtml' => '<p>Get your API key from '
-                    . '<a href="https://openrouter.ai/settings/keys" target="_blank"'
-                    . ' rel="noopener noreferrer">openrouter.ai/settings/keys</a>.</p>',
+                'sectionDescriptionHtml' => '<p>Configure your API key on the '
+                    . '<a href="' . esc_url(admin_url('options-general.php?page=wpconnectors')) . '">'
+                    . 'Connectors settings page</a>.</p>',
                 'pageTitle' => 'OpenRouter',
                 'menuTitle' => 'OpenRouter',
                 'infoCardTitle' => 'About OpenRouter',

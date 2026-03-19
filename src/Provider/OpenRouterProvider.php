@@ -8,7 +8,7 @@ use CoenJacobs\OpenRouterProvider\Plugin;
 use CoenJacobs\OpenRouterProvider\Provider\Models\ImageGenerationModel;
 use CoenJacobs\OpenRouterProvider\Provider\Models\MultiModalTextGenerationModel;
 use CoenJacobs\OpenRouterProvider\Provider\Models\TextGenerationModel;
-use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\Provider\ApiKeyProviderAvailability;
+use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\Provider\RegistryApiKeyProviderAvailability;
 use RuntimeException;
 use WordPress\AiClient\Providers\ApiBasedImplementation\AbstractApiProvider;
 use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
@@ -39,12 +39,13 @@ class OpenRouterProvider extends AbstractApiProvider
             ProviderTypeEnum::cloud(),
             'https://openrouter.ai/settings/keys',
             RequestAuthenticationMethod::apiKey(),
+            'Unified API gateway with hundreds of AI models across multiple providers.',
         );
     }
 
     protected static function createProviderAvailability(): ProviderAvailabilityInterface
     {
-        return new ApiKeyProviderAvailability(Plugin::providerConfig());
+        return new RegistryApiKeyProviderAvailability('openrouter');
     }
 
     protected static function createModelMetadataDirectory(): ModelMetadataDirectoryInterface
