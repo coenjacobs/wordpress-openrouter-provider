@@ -10,29 +10,24 @@ A WordPress plugin that registers [OpenRouter](https://openrouter.ai) as an AI p
 
 ## Installation
 
-Clone this repository into your `wp-content/plugins/` directory:
+Download the latest release zip from the [releases page](https://github.com/coenjacobs/wordpress-openrouter-provider/releases) and install it through **Plugins > Add New > Upload Plugin** in the WordPress admin.
+
+Alternatively, install via WP-CLI:
 
 ```bash
-git clone https://github.com/coenjacobs/wordpress-openrouter-provider.git wp-content/plugins/openrouter-provider
-cd wp-content/plugins/openrouter-provider
-composer install
-```
-
-Activate the plugin through the WordPress admin panel or WP-CLI:
-
-```bash
-wp plugin activate openrouter-provider
+wp plugin install path/to/openrouter-provider.zip --activate
 ```
 
 ## Configuration
 
 ### API Key
 
-The API key can be configured in three ways (in order of precedence):
+Configure your OpenRouter API key on the **Settings > Connectors** screen in the WordPress admin. The OpenRouter connector appears automatically when the plugin is activated.
+
+The API key can also be provided via environment variable or PHP constant:
 
 1. **Environment variable**: Set `OPENROUTER_API_KEY` in your environment
 2. **PHP constant**: Define `OPENROUTER_API_KEY` in `wp-config.php`
-3. **Settings page**: Enter it at **Settings > OpenRouter** in the WordPress admin
 
 ### Model Selection
 
@@ -42,9 +37,13 @@ A **Free/Paid filter** dropdown lets you narrow the list to free or paid models.
 
 ## How It Works
 
-The plugin registers a single provider (`openrouter`) with the WordPress AI Client registry on the `init` hook. All OpenRouter models use the OpenAI-compatible `/chat/completions` endpoint, so only a single model class is needed.
+The plugin registers a single provider (`openrouter`) with the WordPress AI Client registry on the `init` hook. The WordPress Connectors system automatically discovers the provider and handles API key storage and validation.
 
-Model IDs follow the format `provider/model-name` (e.g. `openai/gpt-4o`, `anthropic/claude-3.5-sonnet`). The settings page groups models by this provider prefix.
+All OpenRouter models use the OpenAI-compatible `/chat/completions` endpoint. Model IDs follow the format `provider/model-name` (e.g. `openai/gpt-4o`, `anthropic/claude-3.5-sonnet`). The settings page groups models by this provider prefix.
+
+## Updates
+
+The plugin checks for updates automatically via its integrated update mechanism. Update notifications appear on the WordPress Plugins page just like any other plugin.
 
 ## Development Environment
 
@@ -57,7 +56,7 @@ make build    # Build the Docker image
 make setup    # Full setup: download WordPress, configure, install, activate plugin
 ```
 
-This gives you a working WordPress 7.0-beta2 installation at **http://localhost:8081** (admin/admin) with the plugin activated.
+This gives you a working WordPress installation at **http://localhost:8081** (admin/admin) with the plugin activated.
 
 ### Makefile Targets
 
@@ -68,13 +67,15 @@ This gives you a working WordPress 7.0-beta2 installation at **http://localhost:
 | `make up` / `make down` | Start/stop containers |
 | `make clean-wp` | Stop containers and wipe the WordPress directory |
 | `make composer` | Run `composer install` for the plugin |
+| `make mozart` | Bundle shared package dependencies via Mozart |
 | `make activate` | Activate the plugin via WP-CLI |
+| `make test` | Run all QA checks (lint, PHPStan, PHPMD, docs) |
 
 ### Docker Stack
 
 - **PHP**: 8.5 CLI Alpine with built-in web server
 - **Database**: MariaDB 11
-- **WordPress**: 7.0-beta2 (downloaded via `curl` + `tar`)
+- **WordPress**: 7.0-beta5 (downloaded via `curl` + `tar`)
 
 ### Volume Mounts
 
