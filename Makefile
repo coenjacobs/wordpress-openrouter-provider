@@ -2,7 +2,7 @@
 
 DOCKER_EXEC = docker compose exec -T wordpress
 WP = $(DOCKER_EXEC) wp --allow-root
-WP_VERSION = 7.0-beta2
+WP_VERSION = 7.0-beta5
 
 up:
 	docker compose up -d
@@ -55,7 +55,7 @@ composer:
 
 mozart:
 	cp -r vendor/coenjacobs/wordpress-ai-provider/assets assets
-	docker run --rm -v "$(CURDIR):/project" coenjacobs/mozart /mozart/bin/mozart compose
+	docker run --rm -v "$(CURDIR):/project" coenjacobs/mozart:1.2.1 /mozart/bin/mozart compose
 	$(DOCKER_EXEC) sh -c "cd /var/www/html/wp-content/plugins/openrouter-provider && composer dump-autoload"
 
 activate:
