@@ -6,6 +6,7 @@ namespace CoenJacobs\OpenRouterProvider\Provider;
 
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\AbstractModelMetadataDirectory;
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\ModalityDetector;
+use WordPress\AiClient\Files\Enums\FileTypeEnum;
 use WordPress\AiClient\Messages\Enums\ModalityEnum;
 use WordPress\AiClient\Providers\Models\DTO\SupportedOption;
 use WordPress\AiClient\Providers\Models\Enums\CapabilityEnum;
@@ -120,7 +121,7 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
         return [
             new SupportedOption(
                 OptionEnum::inputModalities(),
-                [$this->detectInputModalities($modelData)]
+                self::modalitySubsets($this->detectInputModalities($modelData))
             ),
             new SupportedOption(
                 OptionEnum::outputModalities(),
@@ -128,6 +129,7 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
             ),
             new SupportedOption(OptionEnum::candidateCount()),
             new SupportedOption(OptionEnum::outputMediaAspectRatio()),
+            new SupportedOption(OptionEnum::outputFileType(), [FileTypeEnum::inline()]),
             new SupportedOption(OptionEnum::customOptions()),
         ];
     }
@@ -144,6 +146,7 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
 
         $options[] = new SupportedOption(OptionEnum::candidateCount());
         $options[] = new SupportedOption(OptionEnum::outputMediaAspectRatio());
+        $options[] = new SupportedOption(OptionEnum::outputFileType(), [FileTypeEnum::inline()]);
         $options[] = new SupportedOption(OptionEnum::customOptions());
 
         return $options;
