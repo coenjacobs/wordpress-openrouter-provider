@@ -36,7 +36,7 @@ jobs:
         run: composer install --no-interaction --no-dev --prefer-dist
 
       - name: Copy assets from shared package
-        run: cp -r vendor/coenjacobs/wordpress-ai-provider/assets assets
+        run: cp -r vendor/coenjacobs/wordpress-ai-provider/assets/. assets
 
       - name: Run Mozart to scope dependencies
         run: docker run --rm -v "${{ github.workspace }}:/project" coenjacobs/mozart /mozart/bin/mozart compose
