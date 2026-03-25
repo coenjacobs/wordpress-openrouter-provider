@@ -7,7 +7,6 @@ namespace CoenJacobs\OpenRouterProvider\Provider;
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\AbstractModelMetadataDirectory;
 use CoenJacobs\OpenRouterProvider\Dependencies\CoenJacobs\WordPressAiProvider\ModelDirectory\ModalityDetector;
 use WordPress\AiClient\Files\Enums\FileTypeEnum;
-use WordPress\AiClient\Messages\Enums\ModalityEnum;
 use WordPress\AiClient\Providers\Models\DTO\SupportedOption;
 use WordPress\AiClient\Providers\Models\Enums\CapabilityEnum;
 use WordPress\AiClient\Providers\Models\Enums\OptionEnum;
@@ -38,6 +37,7 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
             'free' => $isFree,
             'input_modalities' => $architecture['input_modalities'] ?? ['text'],
             'output_modalities' => $architecture['output_modalities'] ?? ['text'],
+            'supported_parameters' => $rawModel['supported_parameters'] ?? [],
         ];
     }
 
@@ -88,68 +88,122 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
     }
 
     /**
-     * Build supported options based on model capabilities.
+     * Build supported options based on model capabilities and supported parameters.
+     *
+     * Uses the `supported_parameters` field from the OpenRouter API to declare
+     * per-model options, rather than a blanket set for all models.
      *
      * @param array<string, mixed> $modelData
      * @return list<SupportedOption>
      */
     protected function buildSupportedOptions(array $modelData): array
     {
-        $outputModalities = $modelData['output_modalities'] ?? ['text'];
-        $hasText = in_array('text', $outputModalities, true);
-        $hasImage = in_array('image', $outputModalities, true);
+        $options = $this->buildBaseOptions($modelData);
+        $options = array_merge($options, $this->buildParameterDependentOptions($modelData));
 
-        if ($hasImage && !$hasText) {
-            return $this->buildImageOnlyOptions($modelData);
+        if ($this->hasImageOutput($modelData)) {
+            $options[] = new SupportedOption(OptionEnum::outputMediaAspectRatio());
+            $options[] = new SupportedOption(OptionEnum::outputFileType(), [FileTypeEnum::inline()]);
         }
 
-        if ($hasImage) {
-            return $this->buildMixedModalityOptions($modelData);
-        }
-
-        return parent::buildSupportedOptions($modelData);
+        return $options;
     }
 
     /**
-     * Build options for pure image generation models.
+     * Build options that are always declared regardless of supported_parameters.
      *
      * @param array<string, mixed> $modelData
      * @return list<SupportedOption>
      */
-    private function buildImageOnlyOptions(array $modelData): array
+    private function buildBaseOptions(array $modelData): array
     {
-        return [
+        $options = [
             new SupportedOption(
                 OptionEnum::inputModalities(),
                 self::modalitySubsets($this->detectInputModalities($modelData))
             ),
             new SupportedOption(
                 OptionEnum::outputModalities(),
-                [[ModalityEnum::image()]]
+                self::modalitySubsets($this->detectOutputModalities($modelData))
             ),
+            new SupportedOption(OptionEnum::systemInstruction()),
             new SupportedOption(OptionEnum::candidateCount()),
-            new SupportedOption(OptionEnum::outputMediaAspectRatio()),
-            new SupportedOption(OptionEnum::outputFileType(), [FileTypeEnum::inline()]),
             new SupportedOption(OptionEnum::customOptions()),
         ];
+
+        return $options;
     }
 
     /**
-     * Build options for mixed text+image models.
+     * Build options conditionally based on the model's supported_parameters.
      *
      * @param array<string, mixed> $modelData
      * @return list<SupportedOption>
      */
-    private function buildMixedModalityOptions(array $modelData): array
+    private function buildParameterDependentOptions(array $modelData): array
     {
-        $options = parent::buildSupportedOptions($modelData);
+        /** @var array<string, callable(): SupportedOption> $parameterMap */
+        $parameterMap = [
+            'temperature'       => static function () {
+                return new SupportedOption(OptionEnum::temperature());
+            },
+            'top_p'             => static function () {
+                return new SupportedOption(OptionEnum::topP());
+            },
+            'top_k'             => static function () {
+                return new SupportedOption(OptionEnum::topK());
+            },
+            'max_tokens'        => static function () {
+                return new SupportedOption(OptionEnum::maxTokens());
+            },
+            'stop'              => static function () {
+                return new SupportedOption(OptionEnum::stopSequences());
+            },
+            'frequency_penalty' => static function () {
+                return new SupportedOption(OptionEnum::frequencyPenalty());
+            },
+            'presence_penalty'  => static function () {
+                return new SupportedOption(OptionEnum::presencePenalty());
+            },
+            'logprobs'          => static function () {
+                return new SupportedOption(OptionEnum::logprobs());
+            },
+            'top_logprobs'      => static function () {
+                return new SupportedOption(OptionEnum::topLogprobs());
+            },
+            'tools'             => static function () {
+                return new SupportedOption(OptionEnum::functionDeclarations());
+            },
+            'response_format'   => static function () {
+                return new SupportedOption(OptionEnum::outputMimeType());
+            },
+            'structured_outputs' => static function () {
+                return new SupportedOption(OptionEnum::outputSchema());
+            },
+        ];
 
-        $options[] = new SupportedOption(OptionEnum::candidateCount());
-        $options[] = new SupportedOption(OptionEnum::outputMediaAspectRatio());
-        $options[] = new SupportedOption(OptionEnum::outputFileType(), [FileTypeEnum::inline()]);
-        $options[] = new SupportedOption(OptionEnum::customOptions());
+        $options = [];
+        $supportedParameters = $modelData['supported_parameters'] ?? [];
+
+        foreach ($parameterMap as $parameter => $factory) {
+            if (in_array($parameter, $supportedParameters, true)) {
+                $options[] = $factory();
+            }
+        }
 
         return $options;
+    }
+
+    /**
+     * Check if the model has image output modalities.
+     *
+     * @param array<string, mixed> $modelData
+     * @return bool
+     */
+    private function hasImageOutput(array $modelData): bool
+    {
+        $outputModalities = $modelData['output_modalities'] ?? ['text'];
+        return in_array('image', $outputModalities, true);
     }
 
     /**
