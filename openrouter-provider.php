@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * Plugin Name: OpenRouter Provider
  * Description: Adds OpenRouter as an AI provider for the WordPress AI Client.
- * Version: 0.6.0
+ * Version: 0.7.0
  * Requires at least: 7.0
  * Requires PHP: 7.4
  * Author: Coen Jacobs
