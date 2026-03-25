@@ -75,7 +75,7 @@ This gives you a working WordPress installation at **http://localhost:8081** (ad
 
 - **PHP**: 8.5 CLI Alpine with built-in web server
 - **Database**: MariaDB 11
-- **WordPress**: 7.0-beta5 (downloaded via `curl` + `tar`)
+- **WordPress**: 7.0-RC1 (downloaded via `curl` + `tar`)
 
 ### Volume Mounts
 

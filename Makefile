@@ -2,7 +2,7 @@
 
 DOCKER_EXEC = docker compose exec -T wordpress
 WP = $(DOCKER_EXEC) wp --allow-root
-WP_VERSION = 7.0-beta5
+WP_VERSION = 7.0-RC1
 
 up:
 	docker compose up -d
