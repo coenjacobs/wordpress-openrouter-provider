@@ -27,11 +27,10 @@ class TextGenerationModel extends BaseTextGenerationModel
     }
 
     /**
-     * Adds top_k parameter support for OpenRouter models.
+     * Extends the base request parameters with OpenRouter-specific options.
      *
-     * The WordPress SDK base class reads topK from ModelConfig but does not
-     * include it in the API request parameters. OpenRouter supports top_k
-     * for many models, so we add it here.
+     * Adds top_k and web_search_options, which the WordPress SDK base class
+     * does not include in the API request parameters.
      *
      * @param list<Message> $prompt The prompt messages.
      * @return array<string, mixed> The request parameters.
@@ -40,9 +39,18 @@ class TextGenerationModel extends BaseTextGenerationModel
     {
         $params = parent::prepareGenerateTextParams($prompt);
 
-        $topK = $this->getConfig()->getTopK();
+        $config = $this->getConfig();
+
+        $topK = $config->getTopK();
         if ($topK !== null) {
             $params['top_k'] = $topK;
+        }
+
+        $webSearch = $config->getWebSearch();
+        if ($webSearch !== null) {
+            $params['web_search_options'] = [
+                'search_context_size' => 'high',
+            ];
         }
 
         return $params;
