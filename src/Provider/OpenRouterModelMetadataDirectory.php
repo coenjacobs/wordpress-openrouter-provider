@@ -180,6 +180,9 @@ class OpenRouterModelMetadataDirectory extends AbstractModelMetadataDirectory
             'structured_outputs' => static function () {
                 return new SupportedOption(OptionEnum::outputSchema());
             },
+            'web_search_options' => static function () {
+                return new SupportedOption(OptionEnum::webSearch());
+            },
         ];
 
         $options = [];
